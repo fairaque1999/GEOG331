@@ -29,4 +29,12 @@ mat.col[1,2]
 mat.col[1,] # first row
 mat.col[,2] # second column
 
+####DATAFRAMES####
+
+# importing the weather station csv file
+dat.w <- read.csv("Z:\\students\\ishraque\\github\\GEOG331\\data\\noaa_weather\\2011124.csv")
+
+# getting more information about the dataframe
+str(dat.w)
+dim(dat.w)
 
