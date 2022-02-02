@@ -37,4 +37,5 @@ dat.w <- read.csv("Z:\\students\\ishraque\\github\\GEOG331\\data\\noaa_weather\\
 # getting more information about the dataframe
 str(dat.w)
 dim(dat.w)
+dat.w
 
