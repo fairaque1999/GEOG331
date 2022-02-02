@@ -34,9 +34,9 @@ mat.col[,2] # second column
 # importing the weather station csv file
 
 if (.Platform$OS.type == "windows") {
-  dat.w <- read.csv("Z:\\students\\ishraque\\github\\GEOG331\\data\\noaa_weather\\2011124.csv")
+  dat.w <- read.csv("Z:\\students\\ishraque\\data\\noaa_weather\\2011124.csv")
 }else if (.Platform$OS.type == "unix") {
-  dat.w <- read.csv("/Volumes/class/GEOG331_S22/students/ishraque/github/GEOG331/data/noaa_weather/2011124.csv")
+  dat.w <- read.csv("/Volumes/class/GEOG331_S22/students/ishraque/data/noaa_weather/2011124.csv")
 }
 
 # getting more information about the dataframe
