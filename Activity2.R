@@ -31,6 +31,7 @@ mat.col[,2] # second column
 
 ####DATAFRAMES####
 
+library(tidyverse)
 # importing the weather station csv file
 
 if (.Platform$OS.type == "windows") {
@@ -42,4 +43,8 @@ if (.Platform$OS.type == "windows") {
 # getting more information about the dataframe
 str(dat.w)
 dim(dat.w)
+
+
+
+
 
