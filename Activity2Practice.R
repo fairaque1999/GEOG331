@@ -43,6 +43,7 @@ if (.Platform$OS.type == "windows") {
 # getting more information about the dataframe
 str(dat.w)
 dim(dat.w)
+dat.w
 
 
 
