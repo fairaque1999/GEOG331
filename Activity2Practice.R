@@ -35,17 +35,62 @@ library(tidyverse)
 # importing the weather station csv file
 
 if (.Platform$OS.type == "windows") {
-  dat.w <- read.csv("Z:\\students\\ishraque\\data\\noaa_weather\\2011124.csv")
+  dat.w <- read.csv("Z:\\students\\ishraque\\data\\noaa_weather\\2011124.csv")#, stringsAsFactors = TRUE)
 }else if (.Platform$OS.type == "unix") {
-  dat.w <- read.csv("/Volumes/class/GEOG331_S22/students/ishraque/data/noaa_weather/2011124.csv")
+  dat.w <- read.csv("/Volumes/class/GEOG331_S22/students/ishraque/data/noaa_weather/2011124.csv", stringsAsFactors = TRUE)
 }
 
 # getting more information about the dataframe
 str(dat.w)
+
+####QUESTION 1#####
 dim(dat.w)
-dat.w
+# There are 157849 rowa and 9 columns
 
+# specify a date format
+dat.w$dateF <- as.Date(dat.w$DATE, "%Y-%m-%d")
+# create a year column
+dat.w$year <- as.numeric(format(dat.w$dateF, "%Y"))
 
+####QUESTION 2#####
+# numeric - the values are numbers or contain decimals
+# integer - special case of numeric data. So it is numeric data with no decimals
+# character - data type for storing texts are strings in R
+# factor - factors are the data objects which are used to categorize the data and store it as levels. They can store both strings and integers. They are useful in the columns which have a limited number of unique values. 
 
+# Find all the unique site names
+site_names <- unique(dat.w$NAME)
 
+# Finding the mean max temperature at Aberdeen as we remove the NA values
+mean(dat.w$TMAX[dat.w$NAME == "ABERDEEN, WA US"], na.rm = TRUE)
 
+# Calculating the average daily temoperature
+dat.w$TAVE <- dat.w$TMIN + ((dat.w$TMAX - dat.w$TMIN)/2)
+
+# Getting aggregate average temperature across all the sites (average of the above averages)
+averageTemp <- aggregate(dat.w$TAVE, by = list(dat.w$NAME), FUN = "mean", na.rm = TRUE)
+# Changing the column names of the averageTemp dataframe
+colnames(averageTemp) <- c("NAME", "MAAT") # MAAT - mean annual air temp
+
+# Converting the sitenames into the underlying factor integer values
+dat.w$siteN <- as.numeric(dat.w$NAME)
+
+# Plotting a histogram with base R
+hist(dat.w$TAVE[dat.w$siteN == 1],
+     freq=FALSE, 
+     main = paste(levels(dat.w$NAME)[1]),
+     xlab = "Average daily temperature (degrees C)", 
+     ylab="Relative frequency",
+     col="grey50",
+     border="white")
+
+# Plotting the histogram with ggplot
+hist <- ggplot(dat.w[dat.w$siteN == 1,], aes(TAVE)) +
+  geom_histogram( aes(y = ..density..), fill="grey50", color="black", binwidth=2)+
+  labs(y="Relative frequency",
+       x = "Average daily temperature (degrees C)",
+       title=paste(levels(dat.w$NAME)[1])) +
+  theme_bw()
+
+####QUESTION 2#####
+# help(hist) and help(paste)
