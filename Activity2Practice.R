@@ -83,14 +83,182 @@ hist(dat.w$TAVE[dat.w$siteN == 1],
      ylab="Relative frequency",
      col="grey50",
      border="white")
+#add mean line with red (tomato3) color
+#and thickness of 3
+abline(v = mean(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE), 
+       col = "tomato3",
+       lwd = 3)
+#add standard deviation line below the mean with red (tomato3) color
+#and thickness of 3
+abline(v = mean(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE) - sd(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE), 
+       col = "tomato3", 
+       lty = 3,
+       lwd = 3)
+#add standard deviation line above the mean with red (tomato3) color
+#and thickness of 3
+abline(v = mean(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE) + sd(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE), 
+       col = "tomato3", 
+       lty = 3,
+       lwd = 3)
+####QUESTION 3#####
+# help(hist) and help(paste)
+# paste converts ones or more R objects (the first argument) into character vectors
+# level
 
+####QUESTION 4#####
 # Plotting the histogram with ggplot
-hist <- ggplot(dat.w[dat.w$siteN == 1,], aes(TAVE)) +
-  geom_histogram( aes(y = ..density..), fill="grey50", color="black", binwidth=2)+
+library(patchwork)
+
+hist1 <- ggplot(filter(dat.w, dat.w$siteN == 1), aes(TAVE)) +
+  geom_histogram( aes(y = ..density..), fill="grey50", color="white", binwidth=2, boundary=2)+
   labs(y="Relative frequency",
        x = "Average daily temperature (degrees C)",
        title=paste(levels(dat.w$NAME)[1])) +
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 1)$TAVE, na.rm=TRUE), color="tomato3", size = 1)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 1)$TAVE, na.rm=TRUE) +
+             sd(filter(dat.w, dat.w$siteN == 1)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 1)$TAVE, na.rm=TRUE) -
+               sd(filter(dat.w, dat.w$siteN == 1)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
   theme_bw()
 
-####QUESTION 2#####
-# help(hist) and help(paste)
+hist2 <- ggplot(filter(dat.w, dat.w$siteN == 2), aes(TAVE)) +
+  geom_histogram( aes(y = ..density..), fill="dodgerblue", color="white", binwidth=2, boundary=2)+
+  labs(y="Relative frequency",
+       x = "Average daily temperature (degrees C)",
+       title=paste(levels(dat.w$NAME)[2])) +
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 2)$TAVE, na.rm=TRUE), color="tomato3", size = 1)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 2)$TAVE, na.rm=TRUE) +
+               sd(filter(dat.w, dat.w$siteN == 2)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 2)$TAVE, na.rm=TRUE) -
+               sd(filter(dat.w, dat.w$siteN == 2)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  theme_bw()
+
+hist3 <- ggplot(filter(dat.w, dat.w$siteN == 5), aes(TAVE)) +
+  geom_histogram( aes(y = ..density..), fill="orange1", color="white", binwidth=2, boundary=2)+
+  labs(y="Relative frequency",
+       x = "Average daily temperature (degrees C)",
+       title=paste(levels(dat.w$NAME)[5])) +
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 5)$TAVE, na.rm=TRUE), color="tomato3", size = 1)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 5)$TAVE, na.rm=TRUE) +
+               sd(filter(dat.w, dat.w$siteN == 5)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 5)$TAVE, na.rm=TRUE) -
+               sd(filter(dat.w, dat.w$siteN == 5)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  theme_bw()
+
+
+hist4 <- ggplot(filter(dat.w, dat.w$siteN == 3), aes(TAVE)) +
+  geom_histogram( aes(y = ..density..), fill="lightgreen", color="white", binwidth=2, boundary=2)+
+  labs(y="Relative frequency",
+       x = "Average daily temperature (degrees C)",
+       title=paste(levels(dat.w$NAME)[3])) +
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 3)$TAVE, na.rm=TRUE), color="tomato3", size = 1)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 3)$TAVE, na.rm=TRUE) +
+               sd(filter(dat.w, dat.w$siteN == 3)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  geom_vline(xintercept=mean(filter(dat.w, dat.w$siteN == 3)$TAVE, na.rm=TRUE) -
+               sd(filter(dat.w, dat.w$siteN == 3)$TAVE, na.rm=TRUE), color="tomato3", size = 1, linetype = 3)+
+  theme_bw()
+
+(hist1|hist2)/(hist3|hist4)
+
+## Drawing the probability distribution using ggplot instead of base R
+## but the fitted normal distribution does not have the same maximum value as 
+## the histogram
+
+# hist_df <- filter(dat.w, dat.w$siteN == 1)
+# fitted_hist <-  ggplot(hist_df, aes(TAVE)) +
+#   geom_histogram( aes(y = ..density..), fill="grey50", color="white", binwidth=2, boundary=2)+
+#   stat_function(fun = dnorm, args = list(mean = mean(hist_df$TAVE, na.rm = T),
+#                                          sd =  sd(hist_df$TAVE, na.rm = T)))+
+#   labs(y="Relative frequency",
+#        x = "Average daily temperature (degrees C)",
+#        title=paste(levels(dat.w$NAME)[1]))
+# 
+# fitted_hist
+# Choose site number first
+
+site <- 1
+
+hist_df <- filter(dat.w, dat.w$siteN == site)
+x.plot <- seq(min(hist_df$TAVE, na.rm = TRUE),max(hist_df$TAVE, na.rm = TRUE), length.out = 100)
+y.plot <-  dnorm(x.plot,
+                 mean(hist_df$TAVE, na.rm=TRUE),
+                 sd(hist_df$TAVE, na.rm=TRUE))
+hist.max <- max(hist(hist_df$TAVE, plot=FALSE)$density)
+y.scaled <- (hist.max/max(y.plot))*y.plot
+
+dist_df <- data.frame(x.plot, y.scaled)
+
+fitted_hist <- ggplot(NULL) +
+  geom_histogram(data = hist_df, aes(x = TAVE, y = ..density..), fill="grey50", color="white", binwidth=2, boundary=2) +
+  geom_line(data = dist_df, aes(x = x.plot, y = y.scaled),  linetype = 2, color = "royalblue3", size = 1) +
+  labs(y="Relative frequency",
+       x = "Average daily temperature (degrees C)",
+       title=paste(levels(dat.w$NAME)[site]))
+
+fitted_hist
+
+####QUESTION 5#####
+# Sites 1 and 2 have normally distributed average temperatures, but sites 3, 4, and 5 seem to have either a skewed or a bi modal distribution
+
+####QUESTION 6#####
+
+# Extreme high temperatures start above the 95th percentile
+
+hi_temp <- qnorm(0.95, mean(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE),
+      sd(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE))
+
+# now the mean increases by 4 and the sd stays the same, which means we have a shifted distribution
+
+# then using this new normal distribution, we can calculate the probability of temperatures greater than teh current threshold from occuring
+
+hi_prob <- pnorm(hi_temp,
+                 mean(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE) + 4,
+                 sd(dat.w$TAVE[dat.w$siteN == 1],na.rm=TRUE))
+
+# There is a roughly 80% chance of crossing the high temp threshold
+
+####QUESTION 7#####
+x<-seq(0, 200, 0.1) 
+y<-dexp(x, 1/5)
+y_gamma <- dgamma(x, shape = 2, scale = 5/2)
+ggdat<-data.frame(x,y)
+
+hist_prcp<- ggplot(filter(dat.w, dat.w$siteN == 1)) +
+  geom_histogram( aes(x = PRCP, y = ..density..), fill="royalblue3", color="white", binwidth=5, boundary=5)+
+  geom_line(data = ggdat, aes(x = x, y = y),  linetype = 2, color = "red", size = 1) + 
+  geom_line(data = ggdat, aes(x = x, y = y_gamma),  linetype = 3, color = "green", size = 1)+
+  labs(y="Relative frequency",
+       x = "Precipitation (in mm)",
+       title=paste(levels(dat.w$NAME)[1])) +
+  theme_bw()
+
+hist_prcp
+
+# exponential distribution seems to fit well and so does the gamma distribution, not much the beta distribution
+
+####QUESTION 8#####
+
+annualPrecip <- aggregate(dat.w$PRCP, by = list(dat.w$NAME, dat.w$year), FUN = "sum", na.rm = TRUE)
+colnames(annualPrecip) <- c("NAME", "year", "Annual_PRCP")
+
+# select the site to plot 
+site <- 3
+
+# sie specific dataframe
+site_prcp <- filter(annualPrecip, as.numeric(NAME) == site)
+
+hist_annual_prcp<- ggplot(site_prcp) +
+  geom_histogram( aes(x = Annual_PRCP, y = ..density..), fill="royalblue3", color="white", bins=15)+
+  labs(y="Relative frequency",
+       x = "Annual Precipitation (in mm)",
+       title=paste(levels(site_prcp$NAME)[site])) +
+  theme_bw()
+hist_annual_prcp
+
+# The data is normally distributed
+
+####QUESTION 9#####
+
+meanPrecip <- aggregate(annualPrecip, by = list(annualPrecip$NAME), FUN = "mean", na.rm = TRUE)
+meanPrecip <- subset(meanPrecip, select = -c(NAME, year))
+colnames(meanPrecip)[1] <- "NAME"
