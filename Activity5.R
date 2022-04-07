@@ -4,6 +4,8 @@
 #load in lubridate
 library(lubridate)
 library(tidyverse)
+library(patchwork)
+library(dplyr)
 
 #read in streamflow data
 datH <- read.csv("/Volumes/GEOG331_S22/students/ishraque/data/streamflow/stream_flow_data.csv",
@@ -89,7 +91,6 @@ colnames(sdF) <- c("doy","dailySD")
 #      xlab="Year", 
 #      ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")),
 #      lwd=2)
-
 
 # PLOT WITH SD POLYGON
 
@@ -246,7 +247,7 @@ quantile(datD2017$discharge)
 # Aggregate the precipitation dataset by day and year with the function length
 datPagg <- aggregate(x = datP, by = list(datP$year, datP$doy), FUN=length)
 # Filtering days that have 24 measurements
-datP24 <- filter(x, doy == 24)
+datP24 <- filter(datPagg, doy == 24)
 
 # Creating a dataframe with only the year and day columns of this filtered dataframe
 # Also adding a decimal year column
@@ -284,3 +285,121 @@ legend("topright",
 #subsest discharge and precipitation within range of interest
 hydroD <- datD[datD$doy >= 248 & datD$doy < 250 & datD$year == 2011,]
 hydroP <- datP[datP$doy >= 248 & datP$doy < 250 & datP$year == 2011,]
+
+min(hydroD$discharge)
+
+#get minimum and maximum range of discharge to plot
+#go outside of the range so that it's easy to see high/low values
+#floor rounds down the integer
+yl <- floor(min(hydroD$discharge))-1
+#ceiling rounds up to the integer
+yh <- ceiling(max(hydroD$discharge))+1
+#minimum and maximum range of precipitation to plot
+pl <- 0
+pm <-  ceiling(max(hydroP$HPCP))+.5
+#scale precipitation to fit on the 
+hydroP$pscale <- (((yh-yl)/(pm-pl)) * hydroP$HPCP) + yl
+
+
+par(mai=c(1,1,1,1))
+#make plot of discharge
+plot(hydroD$decDay,
+     hydroD$discharge, 
+     type="l", 
+     ylim=c(yl,yh), 
+     lwd=2,
+     xlab="Day of year", 
+     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")))
+#add bars to indicate precipitation 
+for(i in 1:nrow(hydroP)){
+  polygon(c(hydroP$decDay[i]-0.017,hydroP$decDay[i]-0.017,
+            hydroP$decDay[i]+0.017,hydroP$decDay[i]+0.017),
+          c(yl,hydroP$pscale[i],hydroP$pscale[i],yl),
+          col=rgb(0.392, 0.584, 0.929,.2), border=NA)
+}
+
+#####################QUESTION 8#####################
+
+# Choosing another day in the winter to make a hydrograph
+
+# Looking at our filtered precipitation dataframe from question 7, we select days
+# 13 and 14 of the year 2012 (have all 24 hour prcp measurements) which are winter days
+
+#subsest discharge and precipitation within range of interest
+hydroD2 <- datD[datD$doy >= 13 & datD$doy < 15 & datD$year == 2012,]
+hydroP2 <- datP[datP$doy >= 13 & datP$doy < 15 & datP$year == 2012,]
+
+#get minimum and maximum range of discharge to plot
+#go outside of the range so that it's easy to see high/low values
+#floor rounds down the integer
+yl2 <- floor(min(hydroD2$discharge))-1
+#ceiling rounds up to the integer
+yh2 <- ceiling(max(hydroD2$discharge))+1
+#minimum and maximum range of precipitation to plot
+pl2 <- 0
+pm2 <-  ceiling(max(hydroP2$HPCP))+.5
+#scale precipitation to fit on the 
+hydroP2$pscale <- (((yh2-yl2)/(pm2-pl2)) * hydroP2$HPCP) + yl2
+
+par(mai=c(1,1,1,1))
+#make plot of discharge
+plot(hydroD2$decDay,
+     hydroD2$discharge, 
+     type="l", 
+     ylim=c(yl2,yh2), 
+     lwd=2,
+     xlab="Day of year", 
+     ylab=expression(paste("Discharge ft"^"3 ","sec"^"-1")))
+#add bars to indicate precipitation 
+for(i in 1:nrow(hydroP2)){
+  polygon(c(hydroP2$decDay[i]-0.017,hydroP2$decDay[i]-0.017,
+            hydroP2$decDay[i]+0.017,hydroP2$decDay[i]+0.017),
+          c(yl2,hydroP2$pscale[i],hydroP2$pscale[i],yl2),
+          col=rgb(0.392, 0.584, 0.929,.2), border=NA)
+}
+
+
+#specify year as a factor
+datD$yearPlot <- as.factor(datD$year)
+#make a boxplot
+ggplot(data= datD, aes(yearPlot,discharge)) + 
+  geom_boxplot()
+
+#make a violin plot
+ggplot(data= datD, aes(yearPlot,discharge)) + 
+  geom_violin()
+#####################QUESTION 9#####################
+
+# Filtering and labeling the data for Seasons
+
+datD2016 <- datD[datD$year == 2016,]
+datD2016season <- datD2016 %>% mutate(Season = case_when(doy >= 1 & doy < 92 ~ "Winter",
+                                                         doy >= 92 & doy < 183 ~ "Spring",
+                                                         doy >= 183 & doy < 275 ~ "Summer",
+                                                         doy >= 275 & doy < 367 ~ "Fall"))
+
+datD2017 <- datD[datD$year == 2017,]
+datD2017season <- datD2017 %>% mutate(Season = case_when(doy >= 1 & doy < 91 ~ "Winter",
+                                                         doy >= 91 & doy < 182 ~ "Spring",
+                                                         doy >= 182 & doy < 274 ~ "Summer",
+                                                         doy >= 274 & doy < 366 ~ "Fall"))
+
+# Plotting the Violin plots
+
+violin2016 <- ggplot(data= datD2016season, aes(Season,discharge)) + 
+              geom_violin()+
+              labs(y=expression(paste("Discharge (ft"^"3 ","sec"^"-1",")")),
+                   x = "Season",
+                   title="Discharge in 2016")+
+              theme_bw()
+
+violin2017 <- ggplot(data= datD2017season, aes(Season,discharge)) + 
+  geom_violin()+
+  labs(y=expression(paste("Discharge (ft"^"3 ","sec"^"-1",")")),
+       x = "Season",
+       title="Discharge in 2017")+
+  theme_bw()
+
+violin2016|violin2017
+              
+
