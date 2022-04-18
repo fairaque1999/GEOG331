@@ -46,8 +46,30 @@ plotRGB(p, r = 3, g = 2, b = 1,
 plot(gtree_proj, add = T)
 plot(b3, add = T)
 
-# plot another raster
+# plot another raster and add the vector points on top
 plotRGB(p2, r = 3, g = 2, b = 1, 
         scale = 65535, 
-        stretch = "histp")
-plot(gtree_proj, add = T, col="red")
+        stretch = "lin")
+plot(gtree_proj, add = T, col="red", cex = gtree_proj$cc.pct/30)
+
+#calculate the ndvi for our raster p2
+
+ndvi <- (p2[[4]] -  p2[[3]])/( p2[[4]] + p2[[3]])
+names(ndvi) <- "ndvi"
+
+# plot the ndvi raster
+png(filename = "ndvi_map.png", width = 6, height = 4, units = 'in', res = 300)
+plot(ndvi)
+plot(gtree_proj, add = T, col="red", cex = gtree_proj$cc.pct/30)
+dev.off()
+
+# extract NDVI values for each point
+
+nt <- terra::extract(ndvi, gtree_proj, fun = mean,
+                     method = 'bilinear')
+
+nt
+
+# Plot ndvi against canopy cover
+par(mai=c(1,1,1,1))
+plot(nt$ndvi, gtree_proj$cc.pct, pch = 16, col = "blue", xlim = c(0,1))
