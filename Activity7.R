@@ -91,3 +91,47 @@ tc <- trainControl(method = "repeatedcv", # repeated cross-validation of the tra
 ###random forests
 #Typically square root of number of variables
 rf.grid <- expand.grid(mtry=1:sqrt(9)) # number of variables available for splitting at each tree node
+
+# Train the random forest model to the Sentinel-2 data
+#note that caret:: will make sure we use train from the caret package
+rf_model <- caret::train(x = trainD[,c(5:13)], #digital number data
+                         y = as.factor(trainD$landcID), #land class we want to predict
+                         method = "rf", #use random forest
+                         metric="Accuracy", #assess by accuracy
+                         trainControl = tc, #use parameter tuning method
+                         tuneGrid = rf.grid) #parameter tuning grid
+#check output
+rf_model
+
+# Apply the random forest model to the Sentinel-2 data
+rf_prediction <- terra::predict(rsmask, rf_model, na.rm = T)
+#view prediction
+plot(rf_prediction)
+
+landclass
+
+#set up categorical colors
+landclass$cols <-c("#a6d854","#8da0cb","#66c2a5",
+                   "#fc8d62","#148011","#ffd92f")
+#make plot and hide legend
+plot(rf_prediction,
+     type = "classes",
+     col=landclass$cols ,
+     legend=FALSE, axes=FALSE)
+legend("bottomleft", paste(landclass$landcover),
+       fill=landclass$cols ,bty="n",horiz = T) 
+
+#get validation data from raster by extracting 
+#cell values at the cell coordinates
+rf_Eval <- extract(rf_prediction, validD[,2:3])
+
+#make the confusion matrix
+rf_errorM <- confusionMatrix(as.factor(rf_Eval[,2]),as.factor(validD$landcID))
+#add landcover names
+colnames(rf_errorM$table) <- landclass$landcover
+rownames(rf_errorM$table) <- landclass$landcover
+#view the matrix
+rf_errorM$table
+
+#look at the overall accuracy
+rf_errorM$overall
